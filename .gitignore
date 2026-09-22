@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# ATD 에이전트 하네스 - 로컬/도구 산출물 (추적 제외)
+.serena/
+.claude/settings.local.json
+.claude/.headroom_wrap_*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
