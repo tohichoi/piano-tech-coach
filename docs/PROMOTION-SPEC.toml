@@ -1,0 +1,106 @@
+# PROMOTION-SPEC.toml
+# Piano Tech Coach - ATD 포트폴리오 연동 단일 규격 (SSOT)
+#
+# 편입 프레임: Adopted Project
+#   디렉터(Mike)가 단독 개발한 기존 프로젝트를 ATD 허브에 편입하여
+#   분석 / 문서화 / 플랫폼 이관 검증 / 감사·검증을 수행하고,
+#   이어 승인 범위에서 소스를 수정한 사례.
+#   ATD 는 최초 구현(2026-06-23)에는 참여하지 않았다.
+#   participating_agents 에는 편입 이후 실제로 수행한 기여만 기재한다.
+#
+# development_origin = "mike+atd" (2026-09-23 확정, 미결 아님)
+#   편입 시점에는 소스 무수정이었으나, 편입 후 거버넌스(Mike)가 소스 수정을 승인했고
+#   ATD 가 실제로 소스를 변경했다. 편입 프레임의 판단 기준은 참여 서술이 아니라
+#   실제 소스 변경 여부다 (core/AGENTS.md §5-1). 변경된 소스:
+#     - 인앱 외장 VST 안내 문구의 Windows 전용 표현을 OS 중립으로 정정
+#       (src/components/InstrumentSelector.tsx, src/components/MidiConnector.tsx)
+#     - Web MIDI 전송 타임스탬프와 Tone/AudioContext 시간축을 분리하는 격리 헬퍼 도입
+#       (src/utils/audioSynth.ts). 메트로놈 정지→재시작 시 Transport 틱 역행 에러는
+#       이 수정으로 해소되지 않았고, 시간축 격리 개선으로만 반영됐다 (PROJECT-DESCRIPTION.md §4.4 N3).
+#     - (완료·검증) 감사 지적 소스 결함 2건: 편차 차트 범례 ±180ms 정정, A11y 폼 라벨 6건
+#       (src/components/DeviationChart.tsx, Metronome.tsx, SheetMusicViewer.tsx, SimulatorPanel.tsx 외).
+#       Noah 재검증 PASS (2026-09-23).
+#   이 값은 case_study_badge = "ATD Adopted Project" 를 반드시 동반해야 하며,
+#   배지 없이 "mike+atd" 를 쓰면 publisher 가 예외를 던져 빌드를 중단한다 (core/AGENTS.md §5-1).
+#   선례(로컬 워크스페이스에서 직접 확인): 두 프로젝트 모두 category="AI & Automation" +
+#   case_study_badge="ATD Adopted Project" + development_origin="mike+atd" 조합을 쓴다.
+#     - sheet-music-extractor          : 저장소 docs/PROMOTION-SPEC.toml:15-19
+#     - generate-roland-hp603-instruments: 저장소 docs/PROMOTION-SPEC.toml:19-23
+#   주의: 허브 docs/projects/*.toml 은 git 원격 등록부일 뿐 development_origin/case_study_badge
+#   필드를 갖지 않으므로, 선례 확인은 각 프로젝트 저장소의 PROMOTION-SPEC.toml 에서 해야 한다.
+#
+# category = "AI & Automation" (거버넌스 승인 확정)
+#   음악/MIDI 도메인 선례(위 두 프로젝트)와 동일 분류를 따른다. 템플릿이 허용하는 분류는
+#   "Vision AI & IoT | Quantitative Trading | System Architecture | AI & Automation" 4종이다.
+
+[project]
+id = "piano-tech-coach"
+title = "Piano Tech Coach"
+subtitle = "디지털 피아노의 MIDI 입력을 브라우저에서 실시간 채점하는 클라이언트 전용 피아노 테크닉 코치"
+category = "AI & Automation"
+status = "Completed"
+case_study_badge = "ATD Adopted Project"
+development_time = "2026.06.23 (커밋 2건, 단일 일자 이력)"
+development_origin = "mike+atd" # 편입 후 ATD 소스 수정 발생 → case_study_badge 동반 필수 (§5-1)
+cost_reduction = "산정 제외 (개인 프로젝트)"
+lead_director = "Mike (Managing Director)"
+thumbnail = "assets/thumbnail.jpg"
+live_demo_url = ""
+repository_url = "https://github.com/tohichoi/piano-tech-coach"
+video_demo = ""
+pdf_report = ""
+
+[[participating_agents]]
+name = "Atlas"
+role = "Chief Strategy Officer"
+contribution = "기준선 확정(origin/main...HEAD 0/0 대조), 코드베이스 전수 분석과 데이터 흐름 정리, ATD 편입 편성, 프로젝트 명세서 및 홍보 산출물 저술"
+
+[[participating_agents]]
+name = "Axel"
+role = "DevOps Platform Engineer"
+contribution = "플랫폼 이관 검증: npm ci 설치·빌드·lint 무결성 확인, 외장 VST 라우팅 문서의 플랫폼 모순(Windows 전용 표기) 확인, 오디오 스택 실동작 확인"
+
+[[participating_agents]]
+name = "Maya"
+role = "Frontend Developer"
+contribution = "인앱 외장 VST 안내 문구의 Windows 전용 표현을 OS 중립으로 정정 (InstrumentSelector.tsx, MidiConnector.tsx). 감사 지적 소스 결함 2건 수정 완료 — 편차 차트 범례 수치 1건 정정(DeviationChart.tsx), A11y 폼 라벨 6건 연결(Metronome.tsx, SheetMusicViewer.tsx, SimulatorPanel.tsx 외). Noah 재검증 PASS"
+
+[[participating_agents]]
+name = "Kai"
+role = "Backend Developer"
+contribution = "Web MIDI 전송 타임스탬프와 Tone/AudioContext 시간축을 분리하는 격리 헬퍼 신설 (audioSynth.ts). 메트로놈 정지→재시작 시 Transport 틱 역행 에러는 해소하지 못했고, 시간축 격리 개선으로만 반영됨"
+
+[[participating_agents]]
+name = "Sora"
+role = "Creative Media Designer"
+contribution = "포트폴리오 에셋 제작 (대표 썸네일 및 UI 개요 이미지 4건, docs/assets/)"
+
+[[participating_agents]]
+name = "Elena"
+role = "Chief Quality & Security Auditor"
+contribution = "편입 슬라이스 무관용 감사, 판정 NEEDS_IMPROVEMENT. N1 재현 검증(가우시안 지터 실측, 밀도·템포 민감도), 서술-구현 불일치 전수 조사, A11y 정적 전수조사, PII/제3자 저작물 전수 검사"
+
+[[participating_agents]]
+name = "Noah"
+role = "Test Optimizer"
+contribution = "산출물 전수 대조(docs/assets/ 4건 실재·JPEG·해상도·선례 파일명 일치, TOML 파싱, 하드 게이트 통과, 4,162행 재측정), 소스 변경 등가성 판정, 빌드·lint·audit 재현, 최소 검증집합 설계"
+
+[[metrics]]
+label = "코드 규모"
+value = "4,162행"
+subtext = "TypeScript/TSX 2,718행 + CSS 1,444행, 백엔드 0행 (클라이언트 전용 SPA). 편입 후 ATD 소스 수정으로 순 +9행"
+
+[[metrics]]
+label = "채점 파라미터"
+value = "35 / 80 / 180ms"
+subtext = "등급 경계 고정 상수, 최종 점수 균일도 60% : 그리드 정확도 40%"
+
+[[metrics]]
+label = "양자화 해상도"
+value = "16분음표"
+subtext = "step = round(ticks / (ppq ÷ 4)), 손 분할은 음높이 60(C4) 기준"
+
+[[metrics]]
+label = "자동 테스트"
+value = "0건"
+subtext = "테스트 프레임워크·테스트 파일 미도입 (감사 대상, PROJECT-DESCRIPTION.md §4.3)"

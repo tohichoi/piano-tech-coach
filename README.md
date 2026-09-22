@@ -26,8 +26,9 @@ Connecting a digital piano via MIDI, uploading a standard MIDI sheet music file,
   - **Jazz Organ** (Classic drawbar organ sine combination)
   - **Synth Lead** (Sawtooth with envelope filter sweep)
 
-### 4. External VST Plugin Routing (loopMIDI / DAW)
-- Supports low-latency MIDI Out routing to control external desktop virtual instruments (VSTs like Keyscape, Kontakt, Serum) inside digital audio workstations (DAWs like Ableton Live, Logic, FL Studio, Reaper) or standalone hosts.
+### 4. External VST Plugin Routing (Virtual MIDI Port / DAW)
+- Supports low-latency MIDI Out routing to control external desktop virtual instruments inside a DAW or standalone host.
+- Uses only the standard Web MIDI API, so the app is OS-independent; the virtual MIDI port is created by your OS (loopMIDI on Windows, the PipeWire MIDI bridge or `snd-virmidi` on Linux). See [External VST Routing Setup Guide](#-external-vst-routing-setup-guide) for per-platform steps.
 
 ### 5. Even-Time & Grid Sync Scoring
 - **Metronome Sync (Grid Accuracy)**: Evaluates absolute timing offset against the metronome grid:
@@ -64,17 +65,18 @@ Connecting a digital piano via MIDI, uploading a standard MIDI sheet music file,
 ## 🚀 Getting Started
 
 ### Prerequisites
-Make sure you have Node.js (version 18 or above) installed.
+Requires Node.js **20.19.0 or later, or 22.12.0 or later** (Vite 8 / rolldown engine requirement). Node 18 is **not** sufficient. Verified on Node v24.15.0 / npm 11.12.1.
 
 ### Installation
 1. Clone the repository or navigate to the workspace folder:
    ```bash
    cd piano-tech-coach
    ```
-2. Install dependencies:
+2. Install dependencies from the lockfile (reproducible install):
    ```bash
-   npm install
+   npm ci
    ```
+   Use `npm ci` (not `npm install`) so the pinned `package-lock.json` versions are reproduced exactly. The lockfile includes platform-specific optional native binaries (e.g. `@rolldown/binding-*`, `@rollup/*`) for all OS/arch combinations; npm installs only the one matching your platform, so the same lockfile works on Windows, macOS and Linux without regeneration.
 3. Run the Vite development server:
    ```bash
    npm run dev
@@ -88,21 +90,49 @@ Make sure you have Node.js (version 18 or above) installed.
 
 ## 🎹 External VST Routing Setup Guide
 
-Since web browsers cannot load Windows VST (.dll / .vst3) binary files directly, you can route the MIDI output from this web app into your desktop DAW or standalone VST host using loopback MIDI ports:
+Web browsers cannot load desktop VST binary files directly, so you route this web app's **MIDI output** into a desktop DAW or standalone virtual instrument. The mechanism is the same everywhere — create a virtual/loopback MIDI port, point both the browser and the DAW at it — but **the tooling is platform-specific**. Pick the section for your operating system.
 
-1. **Create virtual MIDI ports**:
-   - Download and install **loopMIDI** (a free, lightweight Windows utility).
-   - Open loopMIDI and add a new port (e.g., `"loopMIDI Port"`).
-2. **Configure DAW / VST Host**:
-   - Open your DAW (Ableton Live, FL Studio, Reaper, Cubase, etc.) or standalone VST instrument.
-   - Go to preferences and enable `"loopMIDI Port"` as an **Active MIDI Input**.
-   - Load your favorite VST instrument onto a track and arm it for recording/monitoring.
-3. **Configure Web Application**:
-   - Refresh the web app and scroll to the **MIDI Connection** card.
-   - Select `"loopMIDI Port"` under **MIDI Output Device**.
-   - Select your instrument on the **Instrument Selector** as **MIDI Output Port (VST External)**.
-4. **Play**:
-   - Live piano play and sheet music guides will now route into your DAW/VST, outputting studio-grade audio.
+The web app itself is platform-independent: it only uses the standard Web MIDI API (`navigator.requestMIDIAccess`). There is no OS-specific code path in the app. What differs is how your OS exposes virtual MIDI ports.
+
+### 🪟 Windows
+
+1. **Create a virtual MIDI port**:
+   - Install **loopMIDI** (free, lightweight).
+   - Open loopMIDI and add a port (e.g., `"loopMIDI Port"`).
+2. **Configure the DAW / VST host**:
+   - Open your DAW (Ableton Live, FL Studio, Reaper, Cubase, etc.) or a standalone VST host.
+   - Enable `"loopMIDI Port"` as an **Active MIDI Input**.
+   - Load your VST instrument on a track and arm it for monitoring.
+3. **Configure the web app** (the app UI is in Korean; the labels below are the literal on-screen text):
+   - Scroll to the **MIDI 하드웨어 설정** (MIDI Hardware Settings) card.
+   - Pick `"loopMIDI Port"` under **MIDI 출력 장치 (VST 루프백 / DAW 전송용)** (MIDI Output Device).
+   - Select **외장 VST 연동** (External VST) on the **가상 악기 (Virtual Instrument) 선택** card.
+4. **Play** — live playing and the sheet-music guide route into your DAW/VST.
+
+### 🐧 Linux
+
+Linux does not need loopMIDI; virtual MIDI routing is a native kernel/PipeWire feature. There are three options, from most to least recommended:
+
+1. **PipeWire MIDI bridge (default on modern distros)** — PipeWire already exposes a MIDI bridge that other apps and the browser can be patched into. This is the direct equivalent of loopMIDI.
+   - Confirm the bridge exists: `pw-cli list-objects | grep -i "Midi/Bridge"`
+   - Patch connections visually with a PipeWire patchbay such as `qpwgraph` or `Helvum` (install from your distro's package manager), or on the command line with `aconnect`.
+   - Point your DAW at the same port. Native Linux DAWs (Ardour, Reaper for Linux, Qtractor) support this directly; legacy JACK-only apps need `a2jmidid` (`a2jmidid -e`) as a bridge.
+2. **`snd-virmidi` kernel module** — creates ALSA virtual raw-MIDI ports, useful when no PipeWire patchbay is present.
+   ```bash
+   sudo modprobe snd-virmidi          # load the module
+   aconnect -l                        # list ports; look for "Virtual Raw MIDI"
+   aconnect '<browser client>:0' '<DAW client>:0'   # patch browser -> DAW
+   ```
+   To load it on every boot, add `snd-virmidi` to `/etc/modules-load.d/`.
+3. **ALSA `aconnect` / `aplaymidi`** — the low-level tools (`aconnect`, `aplaymidi`) ship with `alsa-utils` and are handy for verifying that a port exists and receiving data. `aplaymidi -l` lists available output ports.
+
+Check whether Chrome can see MIDI at all: open `chrome://settings/content/midi` (or the site-permission prompt) and allow MIDI. Chrome grants Web MIDI access per-site.
+
+> **Note:** Windows `.dll` / `.vst3` plugins do not run natively on Linux. Use native Linux plugins (LV2/VST3, e.g. Surge XT, Vital, Calf, LSP), or run Windows plugins through a compatibility layer such as `yabridge` (Wine-based). The MIDI routing above is independent of which plugin format you host.
+
+### Common final step (all platforms)
+
+Scroll to the **MIDI 하드웨어 설정** (MIDI Hardware Settings) card, select your virtual port under **MIDI 출력 장치 (VST 루프백 / DAW 전송용)** (MIDI Output Device), and choose **외장 VST 연동** (External VST) on the **가상 악기 (Virtual Instrument) 선택** card. Live playing and the sheet-music guide now route into your DAW/VST.
 
 ---
 

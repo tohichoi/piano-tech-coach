@@ -101,6 +101,13 @@ export async function startAudio(): Promise<boolean> {
   }
 }
 
+// Convert a duration offset (seconds from "now") into an absolute timestamp on
+// the performance.now() clock, which is the time base Web MIDI `send()` expects.
+// Kept separate from the Tone/AudioContext clock so the two axes never mix.
+function performanceTimeFromNow(offsetSec: number): number {
+  return performance.now() + offsetSec * 1000;
+}
+
 // Convert MIDI pitch to frequency name (e.g. 60 -> C4)
 function midiToNoteName(midi: number): string {
   const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -134,7 +141,7 @@ export function triggerNoteOn(pitch: number, velocity: number = 0.7) {
   }
 
   if (activeInstrument === 'midi_out') {
-    // Route to Windows VST via MIDI loopback port
+    // Route to an external VST/DAW through the selected MIDI output port
     if (selectedMidiOutput) {
       const velByte = Math.round(velocity * 127);
       selectedMidiOutput.send([0x90, pitch, velByte]);
@@ -190,17 +197,19 @@ export function triggerNoteOnAndOff(pitch: number, velocity: number, durationSec
     startAudio();
   }
 
-  const triggerTime = Tone.now() + timeOffsetSec;
-
   if (activeInstrument === 'midi_out') {
     if (selectedMidiOutput) {
       const velByte = Math.round(velocity * 127);
+      // Web MIDI `send()` timestamps use the performance.now() clock, not the
+      // AudioContext clock. Keep the two axes isolated: convert the (duration)
+      // offset into the performance clock and never pass a Tone time here.
       // Send note on
-      selectedMidiOutput.send([0x90, pitch, velByte], performance.now() + timeOffsetSec * 1000);
+      selectedMidiOutput.send([0x90, pitch, velByte], performanceTimeFromNow(timeOffsetSec));
       // Schedule note off
-      selectedMidiOutput.send([0x80, pitch, 0], performance.now() + (timeOffsetSec + durationSec) * 1000);
+      selectedMidiOutput.send([0x80, pitch, 0], performanceTimeFromNow(timeOffsetSec + durationSec));
     }
   } else {
+    const triggerTime = Tone.now() + timeOffsetSec; // AudioContext time axis
     const note = midiToNoteName(pitch);
     switch (activeInstrument) {
       case 'piano':
@@ -224,7 +233,7 @@ export function triggerMetronomeTick(isFirstBeat: boolean, timeOffsetSec: number
   if (!audioStarted) {
     startAudio();
   }
-  const triggerTime = Tone.now() + timeOffsetSec;
+  const triggerTime = Tone.now() + timeOffsetSec; // AudioContext time axis
   const pitch = isFirstBeat ? 'C6' : 'G5';
   metronomeSynth.triggerAttackRelease(pitch, '32n', triggerTime, isFirstBeat ? 1.0 : 0.6);
 }

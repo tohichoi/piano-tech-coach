@@ -69,11 +69,12 @@ export const Metronome: React.FC<MetronomeProps> = ({
         {/* BPM Slider */}
         <div className="bpm-slider-group">
           <div className="bpm-info">
-            <span className="label">템포 (BPM)</span>
+            <label className="label" htmlFor="metronome-bpm">템포 (BPM)</label>
             <span className="bpm-value">{bpm}</span>
           </div>
           <div className="slider-wrapper">
             <input
+              id="metronome-bpm"
               type="range"
               min="40"
               max="240"

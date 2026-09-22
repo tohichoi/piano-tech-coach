@@ -47,7 +47,7 @@ export const InstrumentSelector: React.FC<InstrumentSelectorProps> = ({
     {
       id: 'midi_out',
       name: '외장 VST 연동',
-      description: 'loopMIDI 가상 포트를 통해 Windows VST로 전송',
+      description: '가상 MIDI 포트를 통해 DAW/VST로 전송',
       icon: <ExternalLink size={20} />,
     },
   ];
@@ -90,9 +90,9 @@ export const InstrumentSelector: React.FC<InstrumentSelectorProps> = ({
 
       {currentInstrument === 'midi_out' && (
         <div className="vst-info-box">
-          <h5>💡 Windows VST 연동 가이드</h5>
+          <h5>💡 외장 VST 연동 가이드</h5>
           <ol>
-            <li><strong>loopMIDI</strong> 등 가상 MIDI 포트 드라이버를 실행하여 포트를 하나 추가합니다.</li>
+            <li>가상 MIDI 포트를 하나 추가합니다. (Windows: <strong>loopMIDI</strong> / Linux: <strong>PipeWire MIDI bridge</strong> 또는 <strong>snd-virmidi</strong>)</li>
             <li>위의 <strong>MIDI 하드웨어 설정</strong>에서 출력 장치를 해당 가상 포트로 지정합니다.</li>
             <li>사용 중인 <strong>DAW (Cubase, Ableton, Reaper 등)</strong>를 열고 MIDI 입력을 해당 가상 포트로 켭니다.</li>
             <li>DAW 안에 원하는 VSTi(가상악기) 트랙을 로드하고 모니터링을 활성화하면 본 앱의 음호출이 해당 고품질 악기로 울리게 됩니다.</li>

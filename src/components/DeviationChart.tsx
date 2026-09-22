@@ -32,7 +32,7 @@ export const DeviationChart: React.FC<DeviationChartProps> = ({ deviations }) =>
   const chartHeight = height - paddingY * 2;
   const centerY = paddingY + chartHeight / 2;
   
-  // Maximum deviation to display (cap at 150ms)
+  // Axis display clamp only (not a rating cutoff — rating bounds live in timeAnalyzer.ts PERFECT/GOOD/POOR_WINDOW)
   const maxDevMs = 150;
 
   // Filter out overlapping notes or just map them in order of occurrence
@@ -188,9 +188,10 @@ export const DeviationChart: React.FC<DeviationChartProps> = ({ deviations }) =>
         </div>
 
         <div className="chart-legend">
+          {/* Legend values are rating cutoffs (symmetric ±) from timeAnalyzer.ts, not the chart's display clamp above */}
           <span className="legend-item"><span className="line perfect" />Perfect (±35ms)</span>
           <span className="legend-item"><span className="line good" />Good (±80ms)</span>
-          <span className="legend-item"><span className="line poor" />Poor (±150ms)</span>
+          <span className="legend-item"><span className="line poor" />Poor (±180ms)</span>
           <span className="legend-item"><span className="line missed" />Missed (놓침)</span>
         </div>
       </div>

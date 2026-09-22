@@ -35,10 +35,11 @@ export const SimulatorPanel: React.FC<SimulatorPanelProps> = ({
       <div className="simulator-body">
         <div className="slider-group">
           <div className="slider-info">
-            <span className="slider-label">연주 정확도 (Accuracy)</span>
+            <label className="slider-label" htmlFor="simulator-accuracy">연주 정확도 (Accuracy)</label>
             <span className="slider-value">{accuracy}%</span>
           </div>
           <input
+            id="simulator-accuracy"
             type="range"
             min="0"
             max="100"

@@ -238,9 +238,10 @@ export const SheetMusicViewer: React.FC<SheetMusicViewerProps> = ({
             {/* Range Selection Inputs */}
             <div className="range-controls-row">
               <div className="range-input-group">
-                <label>연습 시작 마디</label>
+                <label htmlFor="start-measure-input">연습 시작 마디</label>
                 <div className="number-input-wrapper">
                   <input
+                    id="start-measure-input"
                     type="number"
                     min="1"
                     max={totalMeasures}
@@ -252,9 +253,10 @@ export const SheetMusicViewer: React.FC<SheetMusicViewerProps> = ({
               </div>
 
               <div className="range-input-group">
-                <label>연습 종료 마디</label>
+                <label htmlFor="end-measure-input">연습 종료 마디</label>
                 <div className="number-input-wrapper">
                   <input
+                    id="end-measure-input"
                     type="number"
                     min={startMeasure + 1}
                     max={totalMeasures}

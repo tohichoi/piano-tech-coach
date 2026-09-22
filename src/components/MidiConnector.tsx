@@ -165,8 +165,9 @@ export const MidiConnector: React.FC<MidiConnectorProps> = ({
 
         {/* Input Select */}
         <div className="select-group">
-          <label>MIDI 입력 장치 (디지털 피아노)</label>
+          <label htmlFor="midi-input-select">MIDI 입력 장치 (디지털 피아노)</label>
           <select
+            id="midi-input-select"
             value={selectedInputId}
             onChange={(e) => setSelectedInputId(e.target.value)}
             disabled={inputs.length === 0}
@@ -185,14 +186,15 @@ export const MidiConnector: React.FC<MidiConnectorProps> = ({
 
         {/* Output Select (for VST routing) */}
         <div className="select-group">
-          <label>MIDI 출력 장치 (VST 루프백 / DAW 전송용)</label>
+          <label htmlFor="midi-output-select">MIDI 출력 장치 (VST 루프백 / DAW 전송용)</label>
           <select
+            id="midi-output-select"
             value={selectedOutputId}
             onChange={(e) => setSelectedOutputId(e.target.value)}
             disabled={outputs.length === 0}
           >
             {outputs.length === 0 ? (
-              <option value="">연결된 출력 장치 없음 (loopMIDI 설치 권장)</option>
+              <option value="">연결된 출력 장치 없음 (가상 MIDI 포트 설정 권장)</option>
             ) : (
               outputs.map((output) => (
                 <option key={output.id} value={output.id}>
@@ -202,7 +204,7 @@ export const MidiConnector: React.FC<MidiConnectorProps> = ({
             )}
           </select>
           <p className="select-tip">
-            * Windows VST 연동 시, loopMIDI 포트를 선택한 후 DAW의 MIDI 입력을 동일하게 맞춰주세요.
+            * 외장 VST 연동 시, 가상 MIDI 포트를 선택한 후 DAW의 MIDI 입력을 동일하게 맞춰주세요.
           </p>
         </div>
 
